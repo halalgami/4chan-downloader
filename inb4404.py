@@ -19,6 +19,7 @@ def main():
     parser.add_argument('-n', '--use-names', action='store_true', help='use thread names instead of the thread ids (...4chan.org/board/thread/thread-id/thread-name)')
     parser.add_argument('-r', '--reload', action='store_true', help='reload the queue file every 5 minutes')
     parser.add_argument('-t', '--title', action='store_true', help='save original filenames')
+    parser.add_argument('-i', '--ignore-ssl-verification', action='store_true', help='ignore ssl verification')
     args = parser.parse_args()
 
     if args.date:
@@ -39,9 +40,18 @@ def main():
             logging.error("Could not import BeautifulSoup! Disabling --title option...")
             args.title = False
 
+     if args.ignore_ssl_verification:
+         import ssl
+
 def load(url):
     req = urllib.request.Request(url, headers={'User-Agent': '4chan Browser'})
-    return urllib.request.urlopen(req).read()
+
+    ctx = None
+    if args.ignore_ssl_verification:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+    return urllib.request.urlopen(req, context=ctx).read()
 
 def get_title_list(html_content):
     ret = list()
