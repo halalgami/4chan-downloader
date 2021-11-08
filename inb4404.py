@@ -3,6 +3,7 @@ import urllib.request, urllib.error, urllib.parse, argparse, logging
 import os, re, time
 import http.client 
 import fileinput
+import ssl
 from multiprocessing import Process
 
 log = logging.getLogger('inb4404')
@@ -39,9 +40,6 @@ def main():
         except ImportError:
             logging.error("Could not import BeautifulSoup! Disabling --title option...")
             args.title = False
-
-     if args.ignore_ssl_verification:
-         import ssl
 
 def load(url):
     req = urllib.request.Request(url, headers={'User-Agent': '4chan Browser'})
